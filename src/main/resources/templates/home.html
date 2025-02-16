@@ -1,16 +1,30 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{_layout::header(~{::title}, _ , _ )}">
-    
-    <title>Accueil</title>
-
+  <head th:replace="~{_layout::header(~{::title}, _, _)}">
+    <title>Accueil - Menu Manager</title>
     <link rel="icon" href="shop.png">
-</head>
-<body>
+  </head>
+  <body>
     <nav th:replace="~{_layout::navbar}"></nav>
     <div class="container mt-5">
-        <h1><i class="fa-solid fa-otter"></i>Accueil !</h1>
-        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Optio officiis adipisci commodi alias soluta aliquam minus, obcaecati ab quae molestiae?</p>
+      <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+          <h1 class="display-5 fw-bold">
+            <i class="fa-solid fa-otter"></i> Bienvenue sur Menu Manager !
+          </h1>
+          <p class="col-md-8 fs-4">
+            Gérez facilement vos plats et composez des menus savoureux pour satisfaire vos clients.
+          </p>
+          <hr class="my-4">
+          <p class="fs-5">
+            Utilisez notre interface intuitive pour créer, modifier et supprimer vos plats et menus, et visualiser leurs informations nutritionnelles.
+          </p>
+          <p class="lead">
+            <a class="btn btn-primary btn-lg" th:href="@{/plats}" role="button">Voir les Plats</a>
+            <a class="btn btn-secondary btn-lg" th:href="@{/menus}" role="button">Voir les Menus</a>
+          </p>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>

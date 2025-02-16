@@ -1,150 +1,211 @@
 <!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{_layout::header(~{::title}, _ , ~{::script} )}">
-
-  <title>Menus</title>
-
-  <link rel="icon" href="shop.png">
-
-  <script>
-    function confirmDelete(e) {
-      if( ! confirm("Voulez vous supprimer ce délicieux menu? ")) {
-        e.preventDefault();
+  <head th:replace="~{_layout::header(~{::title}, _, ~{::script})}">
+    <title>Menus</title>
+    <link rel="icon" href="shop.png">
+    <script>
+      function confirmDelete(e) {
+        if (!confirm("Voulez-vous supprimer ce délicieux menu? ")) {
+          e.preventDefault();
+        }
+        return;
       }
-      returen
-    }
-  </script>
-  
-</head>
-<body>
-  <nav th:replace="~{_layout::navbar}"></nav>
-
-  <div th:if="${act=='del'}" class="alert alert-dismissible alert-warning">
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    <p class="mb-0">Le menu  a été supprimé ! </p>
-  </div>
-  <div th:if="${act=='new'}" class="alert alert-dismissible alert-success">
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    <p class="mb-0">Le menu [[${menu.nom}]] a été crée</p>
-  </div>
-  <div th:if="${act=='mod'}" class="alert alert-dismissible alert-success">
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    <p class="mb-0">Le menu [[${menu.nom}]] a été modifié</p>
-  </div>
-
-
-  <div class="container mt-5">
-    <h1><i class="fa-solid fa-otter"></i>Nos Menus</h1>
+    </script>
+  </head>
+  <body>
+    <nav th:replace="~{_layout::navbar}"></nav>
     
-    <div th:if="${page.totalElements} > 0">
-      <div class="d-flex align-items-center gap-3">
-        <form th:action="@{/menus}" method="get">
-          <input type="hidden" name="mc" th:value="${mc}">
-          <select name="s" class="form-select" onchange="this.form.submit()">
-            <option value="5" th:selected="${page.size == 5}">5</option>
-            <option value="10" th:selected="${page.size == 10}">10</option>
-            <option value="15" th:selected="${page.size == 15}">15</option>
-          </select>
-        </form>
+    <div th:if="${act=='del'}" class="alert alert-dismissible alert-warning">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <p class="mb-0">Le menu a été supprimé !</p>
+    </div>
+    <div th:if="${act=='new'}" class="alert alert-dismissible alert-success">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <p class="mb-0">Le menu [[${menu.nom}]] a été créé</p>
+    </div>
+    <div th:if="${act=='mod'}" class="alert alert-dismissible alert-success">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <p class="mb-0">Le menu [[${menu.nom}]] a été modifié</p>
+    </div>
+    
+    <div class="container mt-5">
+      <h1><i class="fa-solid fa-otter"></i>Nos Menus</h1>
       
-        <form th:action="@{/menus}" method="get">
-          <input type="hidden" name="s" th:value="${page.size}">
-          <input type="text" name="mc" class="form-control" th:value="${mc}" placeholder="mot clé...">
-        </form>
-      
-        <!-- ms-auto pousse ce lien complètement à droite -->
-        <a th:href="@{/menuEdit(mc=${mc}, p=${page.number}, s=${page.size})}" class="btn btn-info ms-auto">
-          Ajouter
-        </a>
+      <div th:if="${page.totalElements} > 0">
+        <div class="d-flex align-items-center gap-3">
+          <form th:action="@{/menus}" method="get">
+            <input type="hidden" name="mc" th:value="${mc}">
+            <select name="s" class="form-select" onchange="this.form.submit()">
+              <option value="5" th:selected="${page.size == 5}">5</option>
+              <option value="10" th:selected="${page.size == 10}">10</option>
+              <option value="15" th:selected="${page.size == 15}">15</option>
+            </select>
+          </form>
+        
+          <form th:action="@{/menus}" method="get">
+            <input type="hidden" name="s" th:value="${page.size}">
+            <input type="text" name="mc" class="form-control" th:value="${mc}" placeholder="mot clé...">
+          </form>
+        
+          <!-- ms-auto pousse ce lien complètement à droite -->
+          <a th:href="@{/menuEdit(mc=${mc}, p=${page.number}, s=${page.size})}" class="btn btn-info ms-auto">
+            Ajouter
+          </a>
+        </div>
+        
+        <table class="table table-hover mt-3">
+          <thead>
+            <tr>
+              <th scope="col">Id</th>
+              <th scope="col">Nom</th>
+              <th scope="col">Prix</th>
+              <th scope="col">Informations nutritionnelles</th>
+              <th scope="col">Plats</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Chaque ligne reçoit la classe "menu-row" pour que le script puisse la traiter -->
+            <tr class="table-secondary menu-row" th:each="menu : ${listeMenus}">
+              <td th:text="${menu.id}"></td>
+              <td th:text="${menu.nom}"></td>
+              <td th:text="${menu.prix}+'€'"></td>
+              <td>
+                <!-- Section Informations Nutritionnelles -->
+                <details>
+                  <summary>Totaux</summary>
+                  <div class="mb-2">
+                    
+                    <p class="mb-0">
+                      <strong>Total Calories :</strong>
+                      <span class="total-calories">0</span>
+                    </p>
+                    <p class="mb-0">
+                      <strong>Total Lipides :</strong>
+                      <span class="total-lipides">0</span>
+                    </p>
+                    <p class="mb-0">
+                      <strong>Total Protéines :</strong>
+                      <span class="total-proteines">0</span>
+                    </p>
+                    <p class="mb-0">
+                      <strong>Total Glucides :</strong>
+                      <span class="total-glucides">0</span>
+                    </p>
+                  </div>
+                </details>
+              </td>
+              <td>
+                <!-- Section Liste des plats -->
+                <details>
+                  <summary>Plats</summary>
+                  <ul>
+                    <li th:each="plat : ${menu.plats}">
+                      <span th:text="${plat.nom}"></span>
+                      <!-- Élément caché pour chaque information nutritionnelle -->
+                      <span class="plat-calories" th:text="${plat.nbCalories}" style="display:none;"></span>
+                      <span class="plat-lipides" th:text="${plat.nbLipides}" style="display:none;"></span>
+                      <span class="plat-proteines" th:text="${plat.nbProteines}" style="display:none;"></span>
+                      <span class="plat-glucides" th:text="${plat.nbGlucides}" style="display:none;"></span>
+                    </li>
+                  </ul>
+                </details>
+              </td>
+              <td>
+                <a th:href="@{/menuEdit(id=${menu.id}, mc=${mc}, p=${page.number}, s=${page.size})}" class="btn btn-primary">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                <a onclick="confirmDelete(event)" th:href="@{/menuDelete(id=${menu.id}, mc=${mc}, p=${page.number}, s=${page.size})}" class="btn btn-danger">
+                  <i class="fa-solid fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+  
+        <!-- Pagination -->
+        <div th:with="
+            start=${(page.number > 4) ? page.number - 4 : 0},
+            end=${(start + 5 > page.totalPages - 1) ? page.totalPages - 1 : start + 5}">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <ul class="pagination mb-0">
+              <!-- Bouton précédent -->
+              <li class="page-item" th:classappend="${page.first} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/menus(mc=${mc}, p=${page.number-1}, s=${page.size})}">&laquo;</a>
+              </li>
+              <!-- Boutons numérotés -->
+              <li class="page-item" th:each="i : ${#numbers.sequence(start, end)}">
+                <a class="page-link"
+                   th:classappend="${page.number == i} ? ' active' : ''"
+                   th:href="@{/menus(mc=${mc}, p=${i}, s=${page.size})}"
+                   th:text="${i+1}">1</a>
+              </li>
+              <!-- Bouton suivant -->
+              <li class="page-item" th:classappend="${page.last} ? 'disabled' : ''">
+                <a class="page-link" th:href="@{/menus(mc=${mc}, p=${page.number+1}, s=${page.size})}">&raquo;</a>
+              </li>
+            </ul>
+            <!-- Formulaire pour aller directement à une page -->
+            <form class="d-inline-flex align-items-center" th:action="@{/menus}" method="get">
+              <input type="hidden" name="mc" th:value="${mc}" />
+              <input type="hidden" name="s" th:value="${page.size}" />
+              <label class="me-1 mb-0">Page</label>
+              <input type="number" name="p"
+                     min="1"
+                     th:attr="max=${page.totalPages}"
+                     th:value="${page.number+1}"
+                     class="form-control form-control-sm"
+                     style="width: 60px;" />
+              <button type="submit" class="btn btn-sm btn-secondary ms-1">OK</button>
+            </form>
+            <!-- Infos de pagination -->
+            <span class="ms-auto text-muted"
+                  th:text="|(Page ${page.number + 1} / ${page.totalPages})|">
+            </span>
+          </div>
+        </div>
       </div>
       
-      
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Nom</th>
-            <th scope="col">Plats</th>
-            <th></th>
-          </tr>
-        </thead>
-        
-        <tbody>
-          <tr class="table-secondary" th:each="menu : ${listeMenus}">
-            <td th:text="${menu.id}"></td>
-            <td th:text="${menu.nom}"></td>
-            <td ><details text="Plats">
-
-            </details></td>
-            <td>
-              <a th:href="@{/menuEdit(id=${menu.id} ,mc=${mc}, p=${page.number}, s=${page.size})}" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i></a>
-              <a onclick="confirmDelete(event)" th:href="@{/menuDelete(id=${menu.id} ,mc=${mc}, p=${page.number}, s=${page.size})}" class="btn btn-danger"><i class="fa-solid fa-trash"></i></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- On utilise "th:with" pour calculer start/end en Thymeleaf -->
-<div th:with="
-start=${(page.number > 4) ? page.number - 4 : 0},
-end=${(start + 5 > page.totalPages - 1) ? page.totalPages - 1 : start + 5}
-">
-<div class="d-flex align-items-center gap-2 flex-wrap">
-
-<!-- PAGINATION -->
-<ul class="pagination mb-0">
- <!-- Bouton "précédent" -->
- <li class="page-item" th:classappend="${page.first} ? 'disabled' : ''">
-   <a class="page-link" th:href="@{/menus(mc=${mc}, p=${page.number-1}, s=${page.size})}">&laquo;</a>
- </li>
- 
- <!-- Boucle de pages, de "start" à "end" -->
- <li class="page-item" th:each="i : ${#numbers.sequence(start, end)}">
-   <a class="page-link"
-      th:classappend="${page.number == i} ? ' active' : ''"
-      th:href="@{/menus(mc=${mc}, p=${i}, s=${page.size})}"
-      th:text="${i+1}">
-   </a>
- </li>
- 
- <!-- Bouton "suivant" -->
- <li class="page-item" th:classappend="${page.last} ? 'disabled' : ''">
-   <a class="page-link" th:href="@{/menus(mc=${mc}, p=${page.number+1}, s=${page.size})}">&raquo;</a>
- </li>
-</ul>
-
-<!-- Petit formulaire pour aller directement à la page X -->
-<form class="d-inline-flex align-items-center" th:action="@{/menus}" method="get">
-  <!-- On réinjecte les paramètres existants -->
-  <input type="hidden" name="mc" th:value="${mc}" />
-  <input type="hidden" name="s" th:value="${page.size}" />
-  <!-- Saisie de la page (1-based) -->
-  <label class="me-1 mb-0">Page</label>
-  <input type="number" name="p"
-   min="1"
-   th:attr="max=${page.totalPages}"
-   th:value="${page.number+1}"
-   class="form-control form-control-sm"
-   style="width: 60px;" />
-  <button type="submit" class="btn btn-sm btn-secondary ms-1" onclick="this.form.p.value--">OK</button>
- </form>
-
-<!-- Affichage d'infos par ex. Page X/Y -->
-<span class="ms-auto text-muted" 
-th:text="|(Page ${page.number + 1} / ${page.totalPages})|">
-</span>
-</div>
-</div>
-
-
-      
+      <div th:if="${page.totalElements} == 0">
+        <h2 class="text-warning" th:text="|Aucun menu disponible contenant le mot '${mc}'|"></h2> 
+        <a th:href="@{/menus(s=${page.size})}" class="btn btn-info">Retour</a>
+      </div>
     </div>
-
-    <div th:if="${page.totalElements} == 0">
-      <h2 class="text text-warning" th:text="|Aucun menu disponible contenant le mot '${mc}'|"></h2> 
-      
-      <a th:href="@{/menus(s=${page.size})}" class="btn btn-info">Retour</a>
-    </div>
-  </div>
-</body>
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.menu-row').forEach(function(row) {
+          let totalCalories = 0, totalLipides = 0, totalProteines = 0, totalGlucides = 0;
+          row.querySelectorAll('.plat-calories').forEach(function(span) {
+            totalCalories += parseInt(span.textContent) || 0;
+          });
+          row.querySelectorAll('.plat-lipides').forEach(function(span) {
+            totalLipides += parseInt(span.textContent) || 0;
+          });
+          row.querySelectorAll('.plat-proteines').forEach(function(span) {
+            totalProteines += parseInt(span.textContent) || 0;
+          });
+          row.querySelectorAll('.plat-glucides').forEach(function(span) {
+            totalGlucides += parseInt(span.textContent) || 0;
+          });
+          let totalCalEl = row.querySelector('.total-calories');
+          if(totalCalEl) {
+            totalCalEl.textContent = totalCalories+" Kcal";
+          }
+          let totalLipEl = row.querySelector('.total-lipides');
+          if(totalLipEl) {
+            totalLipEl.textContent = totalLipides+" g";
+          }
+          let totalProtEl = row.querySelector('.total-proteines');
+          if(totalProtEl) {
+            totalProtEl.textContent = totalProteines+" g";
+          }
+          let totalGlucEl = row.querySelector('.total-glucides');
+          if(totalGlucEl) {
+            totalGlucEl.textContent = totalGlucides+" g";
+          }
+        });
+      });
+    </script>
+  </body>
 </html>

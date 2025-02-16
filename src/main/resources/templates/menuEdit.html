@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{_layout::header(~{::title}, _, _)}">
+    <title>Edition Menu</title>
+    <link rel="icon" href="shop.png">
+  </head>
+  <body>
+    <nav th:replace="~{_layout::navbar}"></nav>
+    <div class="container mt-5">
+      <div class="card border-secondary">
+        <!-- Titre en fonction de la présence de l'id -->
+        <h2 th:if="${menu.id == 0}" class="card-header">Création Menu</h2>
+        <h2 th:if="${menu.id != 0}" class="card-header">Modification Menu</h2>
+        <form th:action="@{/menuSave}" method="post" th:object="${menu}">
+          <!-- Champs cachés pour les paramètres de pagination et de recherche -->
+          <input type="hidden" name="s" th:value="${s}" />
+          <input type="hidden" name="p" th:value="${p}" />
+          <input type="hidden" name="mc" th:value="${mc}" />
+          
+          <!-- Champ caché pour l'id du menu -->
+          <input type="hidden" th:field="*{id}" />
+
+          <!-- Champ Nom -->
+          <div class="form-group mt-3">
+            <label for="nom">Nom</label>
+            <input type="text" class="form-control" id="nom" th:field="*{nom}" required>
+            <div class="invalid-feedback" th:errors="*{nom}"></div>
+          </div>
+          
+          <!-- Champ Prix -->
+          <div class="form-group mt-3">
+            <label for="prix">Prix</label>
+            <input type="number" step="0.01" class="form-control" id="prix" th:field="*{prix}" required>
+            <div class="invalid-feedback" th:errors="*{prix}"></div>
+          </div>
+          
+          <!-- Champ Plats (multi-select) -->
+          <div class="form-group mt-3">
+            <label for="plats">Plats (CTRL + Click)</label>
+            <select multiple class="form-control" id="plats" th:field="*{plats}">
+              <option th:each="plat : ${listePlats}"
+                      th:value="${plat.id}"
+                      th:text="${plat.nom}">
+              </option>
+            </select>
+            <div class="invalid-feedback" th:errors="*{plats}"></div>
+          </div>
+          
+          <!-- Boutons -->
+          <div class="form-group mt-4">
+            <button type="submit" class="btn btn-success">Valider</button>
+            <a th:href="@{/menus}" class="btn btn-danger">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

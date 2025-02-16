@@ -12,13 +12,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import jimmy.corp.MenuManager.Entity.Categorie;
+import jimmy.corp.MenuManager.Entity.Menu;
 import jimmy.corp.MenuManager.Entity.Plat;
 import jimmy.corp.MenuManager.Repository.CategorieRepository;
+import jimmy.corp.MenuManager.Repository.MenuRepository;
 import jimmy.corp.MenuManager.Repository.PlatRepository;
 
 @Controller
@@ -26,10 +30,13 @@ public class PlatController {
 
     private PlatRepository platRepo;
     private CategorieRepository categRepo;
+    private MenuRepository menuRepo;
 
-    public PlatController( PlatRepository pr, CategorieRepository cr) {
+
+    public PlatController( PlatRepository pr, CategorieRepository cr, MenuRepository mr) {
         this.platRepo = pr;
         this.categRepo = cr;
+        this.menuRepo = mr;
     }
 
     @GetMapping("/plats")
@@ -124,22 +131,29 @@ public class PlatController {
 
     @GetMapping("/platDelete")
     public String supprimerProduit(
-        int s,
-        int p,
-        String mc,
-        Integer id,
-        RedirectAttributes redirectAttributes 
-    ){
-        this.platRepo.deleteById(id);
-
+        @RequestParam int s,
+        @RequestParam int p,
+        @RequestParam String mc,
+        @RequestParam Integer id,
+        RedirectAttributes redirectAttributes
+    ) {
+        // Récupère le plat à supprimer
+        Optional<Plat> optPlat = platRepo.findById(id);
+        if(optPlat.isPresent()){
+            Plat plat = optPlat.get();
+            // Pour chaque menu qui référence ce plat, retirez-le de la liste
+            for(Menu menu : plat.getMenus()){
+                menu.getPlats().remove(plat);
+                menuRepo.save(menu);
+            }
+            // Maintenant, on peut supprimer le plat
+            platRepo.delete(plat);
+        }
+        
         redirectAttributes.addAttribute("s", s);
         redirectAttributes.addAttribute("p", p);
         redirectAttributes.addAttribute("mc", mc);
-
         return "redirect:/plats?&act=del";
     }
-
-
-
 }
 
