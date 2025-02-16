@@ -49,7 +49,7 @@ Installation et Configuration
 -------------------------------
 1. Cloner le Projet
 
-   git clone https://votre-repository-url.git
+   git clone https://github.com/jimmy-txi/Spring-menu-manager.git
    cd MenuManager
 
 2. Configurer la Base de Données
