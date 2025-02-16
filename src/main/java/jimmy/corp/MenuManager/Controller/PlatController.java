@@ -2,6 +2,7 @@ package jimmy.corp.MenuManager.Controller;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,16 +16,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import jimmy.corp.MenuManager.Entity.Categorie;
 import jimmy.corp.MenuManager.Entity.Plat;
+import jimmy.corp.MenuManager.Repository.CategorieRepository;
 import jimmy.corp.MenuManager.Repository.PlatRepository;
 
 @Controller
 public class PlatController {
 
-    private PlatRepository repo;
+    private PlatRepository platRepo;
+    private CategorieRepository categRepo;
 
-    public PlatController( PlatRepository pr ){
-        this.repo = pr;
+    public PlatController( PlatRepository pr, CategorieRepository cr) {
+        this.platRepo = pr;
+        this.categRepo = cr;
     }
 
     @GetMapping("/plats")
@@ -39,9 +44,9 @@ public class PlatController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Plat> pagePlat;
         if(motsCles.length()>0){
-            pagePlat = this.repo.rechercheParContenu('%'+motsCles+'%', pageable);
+            pagePlat = this.platRepo.rechercheParContenu('%'+motsCles+'%', pageable);
         }else{
-            pagePlat = this.repo.findAll(pageable);
+            pagePlat = this.platRepo.findAll(pageable);
         }
 
         model.addAttribute("listePlats", pagePlat.getContent());
@@ -49,7 +54,7 @@ public class PlatController {
         model.addAttribute("mc", motsCles);
 
         if (id>0 && ("new".equals(act) || "mod".equals(act))) {
-            this.repo.findById(id).ifPresent(
+            this.platRepo.findById(id).ifPresent(
                 prod -> {
                     model.addAttribute("plat", prod);
                     model.addAttribute("act",act);
@@ -71,7 +76,7 @@ public class PlatController {
         Model model
     ) {
         if (id>0){
-            Optional<Plat> optPro = this.repo.findById(id);
+            Optional<Plat> optPro = this.platRepo.findById(id);
             if (optPro.isPresent()) {
                 model.addAttribute("plat", optPro.get());
             }else {
@@ -80,6 +85,8 @@ public class PlatController {
         } else {
             model.addAttribute("plat", new Plat());
         }
+        List<Categorie> categories = categRepo.findAll();
+        model.addAttribute("categs", categories);
         model.addAttribute("mc", motsCles);
         model.addAttribute("p", page);
         model.addAttribute("s", size);
@@ -90,28 +97,30 @@ public class PlatController {
     
     @PostMapping("/platSave")
     public String saveProduit(
-        int s,
-        int p,
-        String mc,
-        @Valid Plat plat, 
+        @RequestParam int s,
+        @RequestParam int p,
+        @RequestParam String mc,
+        @Valid Plat plat,
         BindingResult bindingResult,
         Model model
-    ){
-
-        if ( bindingResult.hasErrors()) {
+    ) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("mc", mc);
             model.addAttribute("p", p);
             model.addAttribute("s", s);
-            model.addAttribute("plat", plat);
+            // N'oublie pas de remettre la liste des catégories en cas d'erreur
+            model.addAttribute("listeCategories", categRepo.findAll());
             return "platEdit";
         }
-
+        
+        // La propriété 'categorie' de l'objet 'plat' est déjà renseignée via le binding.
+        platRepo.save(plat);
+        
         String action = (plat.getId() == null) ? "new" : "mod";
-        this.repo.save(plat);
-
-
-        return "redirect:/plats?p="+p+"&s="+s+"&mc="+mc+"&act="+action+"&id="+plat.getId();
+        return "redirect:/plats?p=" + p + "&s=" + s + "&mc=" + mc + "&act=" + action + "&id=" + plat.getId();
     }
+    
+
 
     @GetMapping("/platDelete")
     public String supprimerProduit(
@@ -121,7 +130,7 @@ public class PlatController {
         Integer id,
         RedirectAttributes redirectAttributes 
     ){
-        this.repo.deleteById(id);
+        this.platRepo.deleteById(id);
 
         redirectAttributes.addAttribute("s", s);
         redirectAttributes.addAttribute("p", p);
