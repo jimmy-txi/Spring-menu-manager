@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{_layout::header(~{::title}, _ , _ )}">
+    <title>Accueil</title>
+    <link rel="icon" href="shop.png">
+</head>
+<body>
+    <nav th:replace="~{_layout::navbar}"></nav>
+    <div class="container mt-5">
+        <div class="card border-secondary">
+            <h2 th:if="${plat.id==null}" class="card-header">Création plat</h2>
+            <h2 th:if="${plat.id!=null}" class="card-header">Modification plat</h2>
+            <form th:action="@{/platSave}" method="post" th:object="${plat}">
+                <input type="hidden" name="p" th:value="${p}">
+                <input type="hidden" name="s" th:value="${s}">
+                <input type="hidden" name="mc" th:value="${mc}">
+                <input type="hidden" th:field="*{id}" >
+                
+                <div class="form-group">
+                    <label for="nom">Nom</label>
+                    <input type="text" class="form-control" id="nom" 
+                           th:classappend="${#fields.hasErrors('nom')?'is-invalid':''}" 
+                           th:field="*{nom}" required >
+                    <div class="invalid-feedback" th:errors="*{nom}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="nbCalories">Calories</label>
+                    <input type="number" class="form-control" id="nbCalories" 
+                           th:classappend="${#fields.hasErrors('nbCalories')?'is-invalid':''}" 
+                           th:field="*{nbCalories}" required >
+                </div>
+                <div class="form-group">
+                    <label for="lipides">Lipides</label>
+                    <input type="number" class="form-control" id="lipides" 
+                           th:classappend="${#fields.hasErrors('nbLipides')?'is-invalid':''}" 
+                           th:field="*{nbLipides}" required >
+                </div>
+                <div class="form-group">
+                    <label for="proteines">Protéines</label>
+                    <input type="number" class="form-control" id="proteines" 
+                           th:classappend="${#fields.hasErrors('nbProteines')?'is-invalid':''}" 
+                           th:field="*{nbProteines}" required >    
+                </div>
+                <div class="form-group">
+                    <label for="glucides">Glucides</label>
+                    <input type="number" class="form-control" id="glucides" 
+                           th:classappend="${#fields.hasErrors('nbGlucides')?'is-invalid':''}" 
+                           th:field="*{nbGlucides}" required >
+                </div>
+                <div class="form-group">
+                    <label for="categorie">Catégorie</label>
+                    <select class="form-control" id="categorie" th:field="*{categorie.id}" required>
+                        <option th:each="c : ${categs}" th:value="${c.id}" th:text="${c.nom}"></option>
+                    </select>
+                    <div class="invalid-feedback" th:errors="*{categorie}"></div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success" type="submit">Valider</button>
+                    <a th:href="@{/plats(mc=${mc}, p=${p}, s=${s})}" class="btn btn-danger">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
